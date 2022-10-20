@@ -1,0 +1,250 @@
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+
+\newcommand{\SetDoubleSpace}{\setlength{\baselineskip}{24pt}}
+\newcommand{\SetSingleSpace}{\setlength{\baselineskip}{12pt}}
+
+\newcommand{\ResetSingleSpace}{\addtolength{\baselineskip}{-10pt}}
+\newcommand{\ResetDoubleSpace}{\addtolength{\baselineskip}{10pt}}
+
+% sets top margin. default of 1 inch is added. therefore this set up gets a top margin of 1.2 in. 
+\setlength{\topmargin}{0.0in}
+\setlength{\headheight}{0.1in}
+\setlength{\headsep}{0.1in}
+
+%sets bottom margin to 1.2 inches with default of 1in on bottom. 
+\setlength{\footskip}{0.2in}
+
+\setlength{\textwidth}{5.75in}
+\setlength{\textheight}{8.6in}
+\setlength{\oddsidemargin}{0.50in}
+\setlength{\evensidemargin}{0.50in}
+
+\pagestyle{myheadings}
+
+\newcommand{\belowSecSkip}{\vspace{0.2in}}
+
+\newcommand{\aboveSubSecSkip}{\vspace{0.3in}}
+\newcommand{\belowSubSecSkip}{\vspace{0.15in}}
+
+% **********
+% Changing "lists" styles: TOC, LOF, LOT.
+% **********
+
+% This defines the pagestyle for the toc, lof and lot.
+%   Credit: Department of Physics
+%	    Oregon State University
+%   Also:   Brenton Ching
+%	    July, 2000
+%	    Department of Nuclear Engineering
+%	    Oregon State University
+%   Note:   To use this, your "main.tex" file should
+% 	    look like:
+%    
+%    \pagestyle{startlists}\clearpage	(%1)
+%		\tableofcontents\clearpage		(%2)
+%		\listoffigures\clearpage		(%3)
+%		\listoftables\clearpage			(%4)
+%		\pagestyle{endlists}\clearpage		(%5)
+%		\thispagestyle{empty}			(%6)
+%  	\section*{}				(%7)
+%		\clearpage				(%8)
+%		\pagestyle{myheadings}			(%9)
+%    
+%	    where the TOC (%2), LOF (%3), and LOT (%4) must be
+%	    ordered such that the list which is only ONE page
+%	    is first.  At this time, I don't know why the first
+%	    page is not broken automatically.  Also, (%7)-(%9)
+%	    creates an empty (blank) page.  It's actually tricky;
+%	    the TOC, LOF, and LOT are _not_ sections, rather 
+%	    it's their pagestyles that are defined.
+
+\def\ps@startlists{
+\newdimen\hsave
+\newdimen\tsave
+\newdimen\bsave
+\hsave=\headheight
+\tsave=\textheight
+\bsave=3.75\baselineskip
+\advance \headheight by \bsave
+\advance \textheight by -\bsave
+\addtocontents{toc}{\protect\vspace{-24pt}}
+\addtocontents{lof}{\protect\vspace{-24pt}}
+\addtocontents{lot}{\protect\vspace{-24pt}}
+}
+
+% This re-defines the pagestyle for use AFTER the  toc, lof, and lot.
+
+\def\ps@endlists{
+    \headheight=\hsave
+    \textheight=\tsave
+    \def\@evenhead{}
+    \def\@oddhead{}
+    \def\@evenfoot{}
+    \def\@oddfoot{}
+}
+
+% For spacing between entries (assumes double-spacing has already been
+% invoked) and for longer entries, single spacing. This is to make style consistent with OSU thesis style guide.
+
+%\renewcommand*\l@section{\@dottedtocline{1}{1.5em}{2.3em}}
+%\renewcommand*\l@subsection{\@dottedtocline{2}{3.8em}{3.2em}}
+%\renewcommand*\l@subsubsection{\@dottedtocline{3}{6.3em}{6.0em}}
+\def\l@figure#1#2{\vskip 9.5pt {\baselineskip 14.5pt%
+    \@dottedtocline{1}{1.5em}{2.3em}{#1}{#2}}}
+\let\l@table\l@figure
+
+% For "." from section name to page number.
+
+%\renewcommand*\l@chapter[2]{%
+%  \ifnum \c@tocdepth >\m@ne
+%    \addpenalty{-\@highpenalty}%
+%    \vskip 1.0em \@plus\p@
+%    \setlength\@tempdima{1.5em}%
+%    \begingroup
+%      \parindent \z@ \rightskip \@pnumwidth
+%      \parfillskip -\@pnumwidth
+%      \leavevmode %\bfseries
+%      \advance\leftskip\@tempdima
+%      \hskip -\leftskip
+%      #1\nobreak
+%      \xleaders\hbox{$\m@th
+%        \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+%        mu$}\hfill%
+%      \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+%      \penalty\@highpenalty
+%    \endgroup
+%  \fi}
+
+\def\l@chapter#1#2{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    \setlength\@tempdima{1.5em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leavevmode %\large
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+      \penalty\@highpenalty
+    \endgroup
+  \fi}
+
+% **********
+% Changing toc style:
+% **********
+
+% For "TOC" all caps and centered.
+
+\renewcommand\contentsname{TABLE OF CONTENTS}
+
+% For right-justified "Page" above the page numbers.
+
+\newcommand{\tocPagelabel}{\vspace{0.25in} 
+%	    \flushright \hfill \underline{\bf{Page}}}
+		\flushright \hfill \underline{Page} }   %No Bold, GGD
+
+% This defines the pagesytle for the toc.
+
+\def\ps@toca{\def\@oddhead{\vbox to \headheight{\vss
+%              \hfil\centerline{\bf \contentsname}\hfil\break % old way, BSC
+%              \center{\bf \contentsname}\break                % my way,  BSC
+               \center{ \contentsname}\break                   % No Bold, GGD
+		\tocPagelabel}\break}
+             \def\@oddfoot{}
+             \def\@evenfoot{}
+}
+
+\def\ps@tocb{\def\@oddhead{\vbox to \headheight{\vss
+%              \hfil\centerline{\bf \contentsname \ (Continued)}\hfil\break
+               \hfil\centerline{ \contentsname \ (Continued)}\hfil\break  % No Bold, GGD
+		\tocPagelabel}\break}
+             \def\@oddfoot{}
+             \def\@evenfoot{}
+}
+
+\def\tableofcontents{
+\pagestyle{tocb}\thispagestyle{toca}
+\@starttoc{toc}}
+
+
+% **********
+% Changing lof style:
+% **********
+
+% For "LOF" all caps and centered.
+
+\renewcommand\listfigurename{LIST OF FIGURES}
+
+% For left-justified "Figure" and right-justified "Page" above 
+% the page numbers.
+\newcommand{\lofPagelabel}{\vspace{0.25in} 
+%	\flushleft \underline{\bf{Figure}} \hfill \underline{\bf{Page}}}
+	\flushleft \underline{Figure} \hfill \underline{Page}}   % No Bold, GGD
+
+% This defines the pagestyle for the lof.
+\def\ps@lofa{\def\@oddhead{\vbox to \headheight{\vss
+%	     \hfil\centerline{\bf \listfigurename}\hfil\break
+		 \hfil\centerline{\listfigurename}\hfil\break
+	     \lofPagelabel}}
+             \def\@evenhead{}
+             \def\@oddfoot{}
+             \def\@evenfoot{}
+}
+
+\def\ps@lofb{\def\@oddhead{\vbox to \headheight{\vss
+%             \hfil\centerline{\bf \listfigurename \ (Continued)}\hfil\break
+              \hfil\centerline{\listfigurename \ (Continued)}\hfil\break
+		\lofPagelabel}}
+             \def\@evenhead{}
+             \def\@oddfoot{}
+             \def\@evenfoot{}
+}
+
+\def\listoffigures{
+\pagestyle{lofb}\thispagestyle{lofa}
+\@starttoc{lof}}
+
+
+% **********
+% Changing lot style:
+% **********
+
+% For "LOT" all caps and centered.
+
+\renewcommand\listtablename{LIST OF TABLES}
+
+% For left-justified "Table" and right-justified "Page" above 
+% the page numbers.
+
+\newcommand{\lotPagelabel}{\vspace{0.25in} 
+%	\flushleft \underline{\bf{Table}} \hfill \underline{\bf{Page}}}
+	\flushleft \underline{Table} \hfill \underline{Page}}
+	
+% This defines the pagestyle for the lot.
+
+\def\ps@lota{\def\@oddhead{\vbox to \headheight{\vss
+%             \hfil\centerline{\bf \listtablename}\hfil\break
+             \hfil\centerline{\listtablename}\hfil\break
+		\lotPagelabel}}
+             \def\@evenhead{}
+             \def\@oddfoot{}
+             \def\@evenfoot{}
+}
+
+\def\ps@lotb{\def\@oddhead{\vbox to \headheight{\vss
+%             \hfil\centerline{\bf \listtablename \ (Continued)}\hfil\break
+             \hfil\centerline{\listtablename \ (Continued)}\hfil\break
+		\lotPagelabel}}
+             \def\@evenhead{}
+             \def\@oddfoot{}
+             \def\@evenfoot{}
+}
+
+\def\listoftables{
+\pagestyle{lotb}\thispagestyle{lota}
+\@starttoc{lot}}
+
