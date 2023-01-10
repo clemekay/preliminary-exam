@@ -1,0 +1,273 @@
+\chapter{Proposed method} \label{ch-method}
+
+\section{Variance deconvolution for uncertainty quantification}
+
+\subsection{Variance deconvolution theory}
+\todo{This is the theory section from the csri paper, which still needs to be updated and possibly parsed down, but I'll follow a similar structure.}
+
+This section describes the mathematical foundations behind the use of sampling estimators for MC radiation transport (RT) codes. We present the nested estimators in a general context and highlight how these concepts can be applied to other applications in which there is a source of randomness that cannot be explicitly controlled, \textit{i.e.} in the presence of a generic non-deterministic code. The framework that we want to present and analyze here consists of an MC sampling estimator for the UQ that is used to compute statistics (we will focus here on the variance) of a QoI.
+
+We introduce here some definitions and the notation that will be used in the rest of the manuscript. We consider for simplicity a generic scalar QoI $Q$, which is a function of a vector of input parameters $\xi \in \Xi \subseteq \mathcal{R}^d$, where $d \in \mathcal{N}_0$ is the number of uncertain parameters. As is typical for UQ, we consider a joint probability density function $p(\xi)$ for $\xi$, such that 
+$\int_{\Xi} p(\xi) \, \mathrm{d}\xi = 1.$
+
+Moreover, we are interested in computing (central) moments of Q, such as
+\begin{equation}
+\label{eq:UQmoments}
+  \kbcEE{Q}  = \int_\Xi{ Q(\xi) \, p(\xi) \, \mathrm{d}\xi  } \quad \mathrm{and} \quad 
+  \kbcVar{Q} = \int_\Xi{ \left( Q(\xi) - \kbcEE{Q} \right)^2 p(\xi) \, \mathrm{d}\xi  },
+\end{equation}
+with $\kbcEE{Q}$ and $\kbcVar{Q}$ denoting the mean and the variance of $Q$, respectively.
+
+The MC approximations for the mean and variance can be written by drawing $N_\xi$ samples for the QoI, each of them corresponding to the solution of a possibly expensive computational code (the RT in our case), as
+\begin{equation}
+\label{kbc:eq:UQMC_moments}
+ \begin{split}
+ \kbcEE{Q} &\approx \frac{1}{N_\xi} \sum_{i=1}^{N_\xi} Q( \kbcxii )  \\
+ \kbcVar{Q} &\approx \frac{1}{N_\xi-1} \sum_{i=1}^{N_\xi} \left( Q( \kbcxii ) - \frac{1}{N_\xi} \sum_{k=1}^{N_\xi} Q( \xi^{(k)} )                             
+                                                       \right)^2.
+ \end{split}
+\end{equation}
+Both estimators in Eq.~\eqref{kbc:eq:UQMC_moments} are unbiased; for more details, the interested reader can refer, for instance, to \cite{kbc:Owen}.  
+
+In RT applications, as well in all applications involving non-deterministic codes \cite{kbc:GeraciUSNCCM21}, it is common to be interested in QoIs that are obtained as statistics of elementary and observable events. Without a loss of generality, we consider here observing an elementary realization $f(\xi,\eta)$ of each code run. We have introduced a random variable $\eta$, possibly a random vector, to notionally represent the code's stochastic behavior. We note here that the knowledge of $\eta$ is neither implied nor required for the following derivation, however it reflects the fact that multiple realizations of the code will produce event realizations $f$ corresponding to a different realization of $\eta$ (even for a fixed UQ random input $\xi$). On the other hand, we assume to be able to sample $\xi$ from $p(\xi)$ and to be able to obtain multiple code evaluations for the same value of $\xi$. In the RT case, the elementary event $f$ would correspond to a particle history response (\textit{i.e.} tally), $\xi$ would be the set of UQ parameters, and $\eta$ would be the inaccessible vector of random variables used by the code to generate the particle history and transport events (absorption, scattering, \emph{etc.}) during a particle `random walk.'  
+
+In the following, we consider that $Q(\xi)$ is obtained as an expected value of elementary events $f$ over multiple realizations of $\eta$, generated internally in a non-deterministic code, as
+\begin{equation}
+\label{kbceq:QoI_UQ}
+ Q(\xi) \kbcdefin \kbcEEeta{ f(\xi,\eta) },
+\end{equation}
+where $\kbcEEeta{\cdot}$ is a shorthand used to indicate the expected value over realizations drawn with respect to the variable $\eta$. For RT applications, this corresponds to the expected value over a number of particle histories. In practice, RT codes can only be queried a finite number of times for a fixed UQ parameter configuration, so the value of $\kbcEEeta{ f(\xi,\eta) }$ can only be approximated. Our contribution here is to understand the effect of the MC RT approximation of this term and how it propagates and affect the statistics we want to evaluate for the UQ. An MC estimator can be written for the approximation of Eq.~\eqref{kbceq:QoI_UQ} as
+\begin{equation}
+\label{kbc:eq:QoI_tilde}
+ Q(\xi) = \kbcEEeta{ f(\xi,\eta) } \approx \frac{1}{N_\eta} \sum_{j=1}^{N_\eta} f( \xi, \kbcetaj ) \kbcdefin \tilde{Q}(\xi),
+\end{equation}
+where our approximation $\tilde{Q}(\xi)$ also introduces the notation $\tilde{\cdot}$ to indicate a quantity that embeds the noise/stochasticity introduced by the MC solver, observed with a finite number of instances. If we combine Eqs.~\eqref{kbc:eq:UQMC_moments} and \eqref{kbc:eq:QoI_tilde}, we can obtain an MC-MC estimator for the expected value of the QoI
+\begin{equation}
+ \label{eq:MC_MC_estimator}
+ \kbcEE{Q} \approx \frac{1}{N_\xi} \sum_{i=1}^{N_\xi} Q( \kbcxii ) \approx \frac{1}{N_\xi} \sum_{i=1}^{N_\xi} \tilde{Q}(\kbcxii)
+                                                                   = \frac{1}{N_\xi} \sum_{i=1}^{N_\xi} \left( \frac{1}{N_\eta} \sum_{j=1}^{N_\eta} f( \kbcxii, \kbcetaj ) \right)
+                                                                   \kbcdefin \kbcQexp,
+\end{equation}
+where we introduced the notation $\hat{\cdot}$ to indicate a sample estimator over the UQ parameter space.
+
+Our goal in the next sections is to present several features of this estimator and the variance estimator, under the assumption that the number of histories $N_\eta$ is constant for each UQ sample. Though not strictly required, this simplifies the derivation while still providing insights into the more general case. 
+
+
+\subsection{Statistical properties of the MC-MC estimator}
+\label{kbc:sec:StatisticalProperties}
+In this section, we discuss the features of the MC-MC estimator. We start by considering the estimator bias
+\begin{equation}
+\kbcEE{ \kbcQexp } = \kbcEE{ \frac{1}{N_\xi} \sum_{i=1}^{N_\xi} \tilde{Q}(\kbcxii) } = \kbcEE{  \tilde{Q}(\xi) } = \kbcEExi{ \kbcEEeta{ f(\xi,\eta) } } = \kbcEExi{ Q(\xi) },
+\end{equation}
+where we explicitly indicate the space over which we compute the expected value\footnote{Please note that we do not always write explicitly that space and use $\kbcEE{\cdot}$ in order to simplify the notation whenever the integration variables are easy to identify by the context.}.
+
+The estimator is unbiased due to the linearity of the expected value operators, so it is important to study its variance to understand the impact of the number of both UQ samples $N_\xi$ and histories $N_\eta$. The variance of the MC-MC estimator Eq.~\eqref{eq:MC_MC_estimator} is
+\begin{equation}
+ \label{eq:MC_MC_estimator_va_I}
+ \begin{split}
+ \kbcVar{ \kbcQexp } &= \kbcVar{ \frac{1}{N_\xi} \sum_{i=1}^{N_\xi} \left( \frac{1}{N_\eta} \sum_{j=1}^{N_\eta} f( \xi, \kbcetaj ) \right) } \\
+               &= \kbcVar{ \frac{1}{N_\xi} \sum_{i=1}^{N_\xi} \kbcQpoll(\kbcxii)  } \\
+               &= \frac{1}{\kbcNxi} \kbcVar{ \kbcQpoll }.
+ \end{split}
+\end{equation}
+
+The variance of the quantity $\kbcQpoll$ is indeed a function of the set of samples drawn for both $\xi$ and $\eta$. In order to evaluate this term, we can turn to the law of total variance
+\begin{equation}
+  \kbcVar{Z(X,Y)} = \mathbb{V}ar_{Y}\left[ \mathbb{E}_{X}\left[Z \right] \right] + \mathbb{E}_{Y}\left[ \mathbb{V}ar_{X}\left[ Z \right] \right], 
+\end{equation}
+where $X,Y$ and $Z=Z(X,Y)$ are three random variables.
+
+Applied to $\kbcVar{ \kbcQpoll }$, the law of total variance provides a strategy to decompose this variance into the variance associated with the UQ parameters $\xi$ and the variance associated with the set of particle histories $\eta$. It is important to remark here that, due to computational cost limitations, it is not always possible to obtain an approximation of $\kbcQpoll$ with a large number of histories, in the context of a UQ workflow in which multiple $\kbcQpoll$ should be evaluated for several values of the input vector $\xi$. Therefore, it is important to be able to quantify the additional estimator variance introduced by the MC over $\eta$, which can be written as
+\begin{equation}
+ \label{eq:total_var}
+ \begin{split}
+ \kbcVar{ \kbcQpoll }  &= \kbcVxi{ \kbcEEeta{\kbcQpoll} } + \kbcEExi{ \kbcVeta{\kbcQpoll} } \\
+                 &= \kbcVxi{ \kbcEEeta{ \frac{1}{N_\eta} \sum_{j=1}^{N_\eta} f( \xi, \kbcetaj ) } } + \kbcEExi{ \kbcVeta{ \frac{1}{N_\eta} \sum_{j=1}^{N_\eta} f( \xi, \kbcetaj ) } } \\
+                 &= \kbcVxi{ \kbcEEeta{ f( \xi, \eta ) } } + \kbcEExi{ \frac{ \kbcVeta{f( \xi, \eta )} }{ \kbcNeta } } \\
+                 &= \kbcVxi{ Q } +  \kbcEExi{ \frac{ \kbcSigSqeta }{\kbcNeta}} = \kbcVxi{ Q } +  \kbcEExi{ \kbcSigSqRT },
+ \end{split}
+\end{equation}
+where $\kbcSigSqeta$ is defined as the variance of the histories for one fixed UQ parameter, \textit{i.e.} $\kbcSigSqeta \kbcdefin \kbcVeta{f( \xi, \eta )}$, and $\kbcSigSqRT \kbcdefin \frac{ \kbcSigSqeta }{\kbcNeta}$ is the corresponding MC RT estimator variance. The expression above relates the true variance of the QoI with respect to the UQ parameters, $\kbcVxi{Q}$, and the variability introduced by the use of a finite number of particle histories in the RT Monte Carlo solver, $\kbcSigSqRT$, averaged over the UQ parameter space. Both terms contribute to the polluted variance $\kbcVar{\kbcQpoll}$, which is the variance that one could observe by sampling the QoI obtained for each RT calculation using $\kbcNeta$ particles. In practice, without realizing that an additional contribution to the variance is introduced by $\kbcSigSqRT$, a practitioner would overestimate the parameter variance by assuming $\kbcVxi{Q} \approx \kbcVxi{\kbcQpoll}$. Similarly, the variance of the MC-MC estimator for the QoI is obtained by combining Eqs.~\eqref{eq:MC_MC_estimator_va_I} and \eqref{eq:total_var}
+\begin{equation}
+	\label{kbc:eq:variance}
+ 	\kbcVar{ \kbcQexp } = \frac{\kbcVxi{ Q } +  \kbcEExi{ \kbcSigSqRT }}{\kbcNxi}.
+\end{equation} 
+The goal of a precise estimator is to obtain statistics with the lowest possible variance for a prescribed computational budget. In the case of this MC-MC estimator with the assumption of constant $N_\eta$ for all $N_\xi$ UQ runs, the total computational budget is $\mathcal{C} = N_\xi \times N_\eta$. Therefore, it is possible to note how the variance $\kbcVar{\kbcQexp}$ is minimized for $N_\eta=1$, which suggests that the most effective estimator for the mean is obtained by using a single particle history per UQ simulation\footnote{We note that in the case of $\kbcNeta=1$, it would not be possible to estimate the term $\kbcEExi{ \kbcSigSqRT }$.}. The interested reader can refer to \cite{kbc:GeraciANS21}, where these estimators have been discussed in the context of non-intrusive spectral projection for polynomial chaos computations. In the next section, we discuss the impact of the number of particles $N_\eta$ in the variance estimation.
+
+
+\subsection{Variance deconvolution and practical implementation}
+The law of total variance allows for the decomposition of the total variance, namely $\kbcVxi{\kbcQpoll}$, into two contributions: the true QoI variance, $\kbcVxi{Q}$, and the average over the UQ parameter space of the noise introduced by the limited number of particle histories, $\kbcEExi{ \kbcSigSqRT }$, which also corresponds to the estimator variance of the RT MC solver. A few considerations are in order here. In general, we are interested in characterizing the variance of the QoI $\kbcVxi{Q}$, referred to hereafter simply as $\kbcVar{Q}$. However, we cannot access this quantity directly. As previously discussed, the QoI $Q$ can be only approximated with $\kbcQpoll$, and this latter quantity can be considered to be polluted by MC noise. On the other hand, the possibility of obtaining several evaluations of $\kbcQpoll$ (for several sample of $\xi$) makes its variance an accessible quantity, \textit{i.e.} it can be estimated. Similarly, given multiple particle histories per UQ sample, it is possible to estimate the term $\kbcSigSqeta = \kbcVeta{f}$ at each UQ parameter location, and, consequently, $\kbcSigSqRT$.
+
+It follows that the true variance can be written by removing the noise introduced by the finite number of particles from the polluted variance
+\begin{equation}
+\label{kbc:eq:evade_theory}
+ \kbcVxi{Q} = \kbcVar{Q} = \kbcVar{\kbcQpoll} - \kbcEExi{ \kbcSigSqRT },
+\end{equation}
+
+\noindent and its sample estimator counterpart can then be written as
+\begin{equation}
+\label{eq:evade_sampling}
+ \kbcVar{Q} \approx S^2 = \tilde{S}^2 - \kbcmuRT,
+\end{equation}
+where $S^2$ and $\tilde{S}^2$ represent the sample estimators for the true (inaccessible) and polluted variances, respectively and $\kbcmuRT$ indicates the sample mean of the MC RT transport variance over the UQ space. 
+
+If the event associated with each particle history is available, \textit{i.e.} $\left\{ f(\kbcxii,\kbcetaj) \right\}$ with $i=1,\cdots, \kbcNxi$ and $j=1,\cdots,\kbcNeta$, we can define 
+\begin{equation}
+\begin{split}
+ \tilde{S}^2 &= \frac{1}{\kbcNxi-1} \sum_{i=1}^{N_\xi} \left( \kbcQpoll(\kbcxii) - \frac{1}{\kbcNxi} \sum_{k=1}^{\kbcNxi} \kbcQpoll(\xi^{(k)}) \right)^2 \\
+ \kbcmuRT &= \frac{1}{\kbcNxi} \sum_{i=1}^{\kbcNxi} \frac{\kbcSigSqeta(\kbcxii)}{\kbcNeta},
+\end{split} 
+\end{equation}
+where the term $\kbcSigSqeta$ is approximated, for each UQ sample, with an additional sample variance estimator
+\begin{equation}
+ \kbcSigSqeta(\kbcxii) \approx \kbchatSgSqeta(\kbcxii) =\frac{1}{\kbcNeta-1} \sum_{j=1}^{\kbcNeta} \left( f(\kbcxii,\eta^{(j)}) - \frac{1}{\kbcNeta} \sum_{k=1}^{\kbcNeta} f(\kbcxii,\eta^{(k)}) \right)^2. 
+\end{equation}
+
+
+
+\subsection{Application to test problems}
+As proof of concept, the MC-MC estimator is applied here to an example radiation transport problem such that the inner MC loop is a Monte Carlo radiation transport solver and the outer MC loop is over the UQ parameter space. The goal is to provide an estimate of the variance of the QoI, over the UQ parameter space, which for this example problem is transmittance through a slab.
+
+\subsection{Problem Description}
+\label{kbc:sec:problem}
+We solve the stochastic, one-dimensional, neutral-particle, mono-energetic, steady-state radiation transport equation with a normally incident beam source of magnitude one:
+
+\begin{gather}
+	\label{kbc:eq:transport}
+ 	\mu \frac{\partial \psi(x,\mu,\xi)}{\partial x} + \Sigma_t(x,\xi) \psi(x,\mu,\xi) =  \int_{-1}^{1} d\mu' \psi(x,\mu',\xi) \frac{\Sigma_s(x,\mu' \rightarrow \mu,\xi)}{2} , \\
+	0 \leq x \leq L; \quad -1 \leq \mu \leq 1, \\
+	\psi(0,\mu,\xi) = 1, \mu > 0; \quad \psi(L,\mu,\xi) = 0, \mu < 0
+\end{gather}
+\noindent where $\psi(x, \mu, \xi)$ is angular flux, $\Sigma_t(x, \xi)$ is total cross section, $\Sigma_s(x,\mu, \xi)$ is scattering cross section, and $x$, $\mu$, and $\xi$ respectively denote dependence on space, angle, and the vector of independent uncertain variables. The problem boundaries are fixed, i.e. $x \in [0,L]$, as are the locations between material regions. The problem is solved for two different scenarios: attenuation only, in which $\Sigma_s(x,\mu,\xi) = 0$; and with both attenuation and isotropic scattering. For both scenarios, the total cross section of each material is assumed to be uniformly distributed. In the scenario which also involves scattering, the ratio of scattering to total cross section $c$ is distributed uniformly and independently of $\Sigma_t$. We consider a slab with a total of $M$ materials, where for each region $m$ the total cross section is defined as    
+\begin{equation}
+	\Sigma_{t,m}(\xi_m) = \bar{\Sigma}_{t,m} + \Sigma_{t,m}^{\Delta}\xi_m
+\end{equation}
+with $\bar{\Sigma}_{t,m}$ representing the average total cross section and $\Sigma_{t,m}^{\Delta}$ the deviation from the mean value. Furthermore, a random parameter $\xi_m \sim \mathcal{U}[-1,1]$ is used to represent the variability of $\Sigma_{t,m}(\xi) \sim \mathcal{U}[ \bar{\Sigma}_{t,m}-\Sigma_{t,m}^{\Delta}, \bar{\Sigma}_{t,m}+\Sigma_{t,m}^{\Delta} ]$. For cases with scattering, the scattering ratio is defined analogously using 
+\begin{equation}
+	c_{m}(\xi_{M+m}) = \bar{c}_{m} + c_{m}^{\Delta}\xi_{M+m}
+\end{equation} 
+where $\xi_{M+m} \sim \mathcal{U}[-1,1]$, with $m=1,\dots,M$, is a uniformly distributed random variable. We note that in the attenuation-only case the problem contains a number of uncertain parameters equal to the number of materials, \textit{i.e.} $\xi \in \mathbb{R}^d$ with $d=M$, whereas in the case of both attenuation and scattering $d=2M$.   
+
+\subsection{Analytic Solution}
+\label{kbc:sec:analytic}
+For a problem in which $\Sigma_s(x) = 0$, i.e. attenuation-only, an analytic solution for uncollided transmittance of a normally incident beam through a slab is
+
+\begin{equation}
+	\label{kbc:eq:trans}
+	T(\xi) = \psi(L, 1, \xi) = \text{exp} \left[ \sum_{m=1}^M \Sigma_{t,m}(\xi_m) \Delta x_m \right].
+\end{equation}
+
+\noindent The $p$th raw moment for the transmittance, as derived in \cite{kbc:OlsonANS2017}, can be written as
+
+\begin{equation}
+	\label{kbc:eq:moment}
+	\kbcexpec{T^p} = \prod_{m=1}^d exp \left[ -p \bar{\Sigma}_{t,m}\Delta x_m \right] \frac{sinh \left[ p \Sigma_{t,m}^{\Delta} \Delta x_m \right]}{p \bar{\Sigma}_{t,m}\Delta x_m},
+\end{equation}
+
+\noindent which allows for an exact evaluations of central moments by adopting the well-known transformations from raw to central moments. For instance, for the variance, which is the second central moment, we can write
+
+\begin{equation}
+	\kbcvar{T} = \kbcexpec{T^2} - \kbcexpec{T}^2.
+\end{equation}
+
+Moreover, as it is also possible to compute the variance $\kbcEExi{ \kbcSigSqRT }$ in closed form for this problem, this example is well suited for verification purposes.  
+
+
+\subsection{Optimizing the estimator}
+The actual process has been:
+\begin{enumerate}
+    \item I ran numerical experiments for a number of total estimator costs to see if the trend was universal, and it appeared to be. Ran atten-only and scattering test cases for a 1D slab. 
+    \item Gianluca finished a closed-form expression for the derivative $\frac{\partial \mathbb{V}ar[\tilde{S}^2]}{\partial N_\eta}$ and attempted to use that closed-form solution to plot the same trendline that I found numerically. It was close, but slightly off. 
+    \item I separately went through the derivations for the same closed-form expression for the derivative and found a coefficient that disagreed with one of Gianluca's; this fixed the issue, and we confirmed that the closed-form solution agreed with the existing numerical results. 
+    \item Gianluca applied this closed-form expression to the test 1D slab with 3 material sections we'd been using to get an analytic solution for all of the necessary terms in the derivative, and wrote a Python function to find the minimum of this expression using the calculated terms. This optimizer computed a minimum that agreed with the existing numerical results. 
+    \item Current status: The goal is to be able to run a pilot study and correctly calculate the optimum, meaning we need to be able to numerically compute these terms. I've written out derivations to check for bias in the numerically accessible terms compared to the terms in the closed-form derivative expression, and tried correcting some of the biases, but still am not able to use numerical results for the derivative terms to calculate an optimum that matches our existing results. 
+    \end{enumerate}
+
+
+\section{Global sensitivity analysis for stochastic solvers}
+\subsection{Straightforward Saltelli}
+\todo{From submitted M\&C extended abstract.}
+Let's consider a generic QoI $Q$, which expresses a mapping from the vector of $d$ input parameters $\xi \in \Xi \subset \mathbb{R}^d$, with joint probability density function (PDF) $p(\xi)$, as $Q = Q(\xi)$. In standard UQ workflows, we are concerned with estimating statistics for $Q$ with respect to the input parameters, \textit{e.g.} moments like the mean and variance:
+\begin{equation}
+\label{eq:UQmoments}
+%  \begin{split}
+ \EExi{Q} \defin \int_\Xi Q(\xi) p(\xi) d\xi \quad \mathrm{and} \quad 
+ \Vxi{Q} \defin \int_\Xi \left( Q(\xi) - \EExi{Q} \right)^2 p(\xi) d\xi.
+%  \end{split}
+\end{equation}
+
+In GSA\footnote{We limit ourselves to variance-based decomposition strategies here, although other approaches are also possible.}, %~\cite{OwenHigh,GeraciCMAME}}, 
+we are interested in determining how each parameter $\xi_i$, or their combinations, affects the variance. The ANalysis Of VAriance (ANOVA) approach, introduced by Sobol' in the seminal paper~\cite{sobol}, is the most adopted method. % and additional details will be provided in the full paper. 
+Sobol's decomposition allows us to write the variance of $Q$ as the sum of conditional contributions~\cite{Crestaux2009}
+\begin{equation}\label{eq:conditional-var}
+ \Vxi{Q} = \sum_{\substack{u \subseteq \left\{ 1, 2, \dots, d \right\} \\ u \neq \emptyset}} V_u, \quad \mathrm{where} \quad 
+% \end{equation}
+% where
+% \begin{equation}
+ V_u = \Var{ \EE{ Q | \xi_u } } - \sum_{ \substack{ v \subset u, v \neq u,  v \neq \emptyset } } V_v,
+\end{equation}
+where we use $u$ to indicate a set of indices that define $\xi_u = \left[ \xi_{u_1}, \dots, \xi_{u_s} \right]^{\mathrm{T}}$, where $s = \mathrm{card}(u)$. It follows that the Sobol' indices can be defined as 
+\begin{equation}\label{eq:si}
+ S_u = \frac{V_u}{\Vxi{Q}}, \quad \mathrm{with} \quad 
+ \sum_{ \substack{ u \subseteq \left\{ 1, 2, \dots, d \right\} \\ u \neq \emptyset } } S_u = 1,
+\end{equation}
+where, if $s=1$, we refer to $S_u$ as first-order sensitivity index (SI).
+% We are usually interested in the first-order sensitivity indices ($s=1$), which measure the effect of each single variable or the total indices, which aggregate the effect of all sensitivity indices in which a specific variable is contained.
+%
+% In the context of MC RT, we embed the concept of variance deconvolution in all the GSA tasks. The interested reader should refer to our previous work, \textit{e.g.}~\cite{ClementsCSRI2021} for more details, although an highlight of this is introduced in the following. 
+In MC RT applications, %the presence of non-deterministic solvers, 
+the QoI $Q$ can only be approximated by averaging a number of realizations (see~\cite{ClementsANS2022} for details). For instance, if we indicate the elementary particle history event with $f$, $Q(\xi)$ can be thought of as
+\begin{equation}
+ Q(\xi) \defin \EEeta{ f(\xi,\eta) } \approx \frac{1}{\Neta} \sum_{j=1}^{\Neta} f( \xi, \eta^{(j)} ) \defin \Qpoll(\xi).
+\end{equation}
+% where we explicitly highlighted how the finite number of particle histories $\Neta$ introduces an approximation.
+The additional variable $\eta$ is introduced only to notionally represent the randomness of a MC RT solver. In practice, $\eta$, unlike $\xi$, is not controlled and merely reflects that multiple particle histories, even if for the same system defined by $\xi$, will follow different trajectories. The variance deconvolution consists of %applying the law-of-total variance for 
+obtaining an approximation of the parametric variance $\Vxi{Q}$ from observable quantities via%This relationship can be expressed as
+\begin{equation}\label{eq:var-deconv}
+ \Vxi{Q} = \Var{\Qpoll} - \frac{\EExi{ \SigSqeta }}{\Neta},
+\end{equation}
+where $\Var{\Qpoll}$ represents the total variance (corrupted by the MC RT noise) and $\EExi{ \SigSqeta }$ represents the average contribution of the solver's stochasticity $
+\SigSqeta\defin \Veta{ f }$. %This tool can be used for both sampling- and PCE-based GSA approaches. 
+% 
+% construction (which in turn can be used for GSA). These details are briefly hinted in the following, while
+%Additional details will be provided in the full manuscript.
+
+\subsection{Existing methods for GSA with stochastic solvers}
+\subsection{Variance deconvolution appended to Saltelli}
+\todo{From submitted M\&C extended abstract.}
+The widely-adopted ANOVA method %introduced by Saltelli~\cite{Saltelli} 
+assumes a deterministic solver, therefore not taking into account the additional stochasticity introduced by MC solvers. In~\cite{OlsonANSWinter}, we incorporated variance deconvolution to %into the Saltelli method, 
+provide an unbiased sampling-based method for computing SI when using an MC RT solver. %This is summarized below.
+%
+% From the definition of Sobol' indices in Eq.~\ref{eq:si}, we see that we need $\Vxi{Q}$ and  $V_u \forall u \in d$, where $V_u$ is the conditional variance $\Var{ \EE{ Q | \xi_u } }$. To further understand the conditional variance of UQ parameter $\xi_u$ from our variance deconvolution approach, we can break $\xi$ down into its components $\xi_u, u=1,2,..,d$ such that $Q\left(\xi\right) = Q\left( \xi_u, \xi_{\sim u} \right)$. 
+If we introduce additional notation for the expectation of the QoI as a function of just a variable of interest $\xi_u$, we can write
+\begin{equation}
+ P(\xi_u) \defin \EEnu{ Q(\xiu,\xinu) } \approx \frac{1}{\Nsi} \sum_{k=1}^{\Nsi} \Qpoll( \xiu, \xinu^{(k)} ) \defin \Ppoll(\xiu),
+\end{equation}
+and we can express Eqs.~\eqref{eq:conditional-var} and \eqref{eq:si} as 
+% Eq.~\ref{eq:var-deconv} can be extended to deconvolve $\Var{\Ppoll}$ into contributions from $\xiu$ and $\xinu$:
+\begin{equation}
+ V_u %= \Var{\EE{Q | \xiu}} = \Vu{P} 
+     = \Var{\Ppoll} - \frac{\EEu{ \Vnu{\Qpoll} }}{\Nsi} \quad \mathrm{and} \quad 
+% \end{equation}
+% 
+% Applying this notation, the main effect SI of $\xi_u$ can be written as 
+% \begin{equation}\label{eq:si-deconv}
+ S_u %= \frac{V_u}{\Vxi{Q}} 
+     = \frac{\Var{\Ppoll} - \frac{\EEu{ \Vnu{\Qpoll} }}{\Nsi}}{\Var{\Qpoll} - \frac{\EExi{ \SigSqeta }}{\Neta}} .
+\end{equation}
+
+% To calculate the denominator terms terms in Eq.~\ref{eq:si-deconv}, we split the total desired estimator cost $C$ into a number of UQ samples $\Nxi$ and a number of histories per UQ sample $\Neta$ such that $C = \Nxi \times \Neta$. For each UQ sample $\xi_i, i=1,..,\Nxi$, we calculate the polluted QoI $\Qpoll \left( \xi_i \right)$ and solver variance $\SigSqeta \left( \xi_i \right)$. After all UQ samples are complete, calculate the variance of the polluted samples $ \Var{\Qpoll}$ and average contribution of the solver's stochasticity $\EExi{ \SigSqeta }$. 
+% The algorithm for calculating $V_u$ is similar, but requires further decomposition in that we must hold parameter $\xiu$ constant while re-sampling all other UQ parameters $\xinu$ $N_{SI}$ times, to compute $\Vnu{\Qpoll}$. This must be done for each of the main and total effect SIs, meaning this process must be completed $2d$ times to obtain all $S_u$ and $S_{Tu}$. Incorporating this into the total estimator cost, $C = \Nxi \times N_{SI} \times 2d \times \Neta$. 
+Computing $V_u$ requires holding parameter $\xiu$ constant while re-sampling all other UQ parameters $\xinu$ $N_{SI}$ times. %to compute $\Vnu{\Qpoll}$. The need for evaluating the $2d$ $S_u$ and $S_{Tu}$ terms reflects in a total computational cost 
+% This must be done for each of the main and total effect SIs, meaning this process must be completed $2d$ times to obtain all $S_u$ and $S_{Tu}$. Incorporating this into the total estimator cost, 
+For $d$ main and $d$ total effects, the total estimator cost is $C = \Nxi \times N_{SI} \times 2d \times \Neta$. 
+
+
+
+
+% Note - if third section ends up being GSA using surrogate models, it will follow a similar structure to the GSA section above ^
+\section{Challenge problem application}
+\subsection{Benchmark deterministic problem}
+
+\section{Foreseen challenges}

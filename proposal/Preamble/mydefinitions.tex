@@ -2,11 +2,11 @@
 %	VALUES FOR THE THESIS
 %----------------------------------------------------------------------------------------
 
-\newcommand{\name}{Worakrit Thida} % Author name
-\newcommand{\thesistitle}{Water wave manipulation using metamaterials} % Title of the thesis
-\newcommand{\submissiondate}{October, 2019} % Submission date "Month, year"
-\newcommand{\advisor}{Sorasak Danworaphong} % Supervisor name
-\newcommand{\coadvisor}{Someone Someone} % Co-Supervisor name, comment this line if there is none
+\newcommand{\name}{Kayla Clements} % Author name
+\newcommand{\thesistitle}{Global sensitivity analysis methods for Monte Carlo radiation transport solvers} % Title of the thesis
+\newcommand{\submissiondate}{January, 2023} % Submission date "Month, year"
+\newcommand{\advisor}{Todd Palmer} % Supervisor name
+%\newcommand{\coadvisor}{Someone Someone} % Co-Supervisor name, comment this line if there is none
 
 
 %----------------------------------------------------------------------------------------
@@ -45,3 +45,79 @@
 \end{critere}
 \end{minipage}  } \end{center}
 }
+
+% Kayla
+\newcommand{\todo}[1]{\textcolor{red}{(#1)}}
+% todo command from https://tex.stackexchange.com/questions/247681/how-to-create-checkbox-todo-list
+\usepackage{enumitem}
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}%
+{\large\hspace{1pt}\cmark}}\hspace{-2.5pt}}
+\newcommand{\cancel}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}
+
+% Definitions ---------------------------------------------------------------------
+% Add your own definitions here --------------------------------------------------
+\newcommand{\kbcvar}[2][]{\mathbb{V}ar_{#1} \left[ #2 \right] }
+\newcommand{\kbcexpec}[2][]{\mathbb{E}_{#1} \left[ #2 \right] }
+
+%commands from primer
+\newcommand{\kbcVar}[1]{\mathbb{V}ar\left[#1\right]}
+\newcommand{\kbcEE}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\kbcCov}[2]{\mathbb{C}ov\left[#1,#2\right]}
+
+\newcommand{\kbcEExi}[1]{\mathbb{E}_\xi\left[#1\right]}
+\newcommand{\kbcEEeta}[1]{\mathbb{E}_\eta\left[#1\right]}
+
+\newcommand{\kbcNxi}{N_\xi}
+\newcommand{\kbcNeta}{N_\eta}
+
+\newcommand{\kbcVeta}[1]{\mathbb{V}ar_{\eta}\left[#1\right]}
+\newcommand{\kbcVxi}[1]{\mathbb{V}ar_{\xi}\left[#1\right]}
+
+\newcommand{\kbcdefin}{\overset{\operatorname{def}}{=}}
+
+\newcommand{\StmD}{\Sigma_t^\Delta \Delta x}
+\newcommand{\StdD}{\Sigma_t^\Delta \Delta x}
+
+\newcommand{\kbcxii}{\xi^{(i)}}
+\newcommand{\kbcetaj}{\eta^{(j)}}
+
+\newcommand{\kbcQexp}{\hat{Q}}
+\newcommand{\kbcQpoll}{\tilde{Q}}
+
+\newcommand{\kbcSigSqeta}{\sigma^2_\eta}
+\newcommand{\kbcSigSqRT}{\sigma^2_{RT,\kbcNeta}}
+\newcommand{\kbcmuRT}{\hat{\mu}_{\kbcSigSqRT}}
+\newcommand{\kbchatSgSqeta}{\hat{\sigma}^2_\eta}
+
+\newcommand{\Var}[1]{\mathbb{V}ar\left[#1\right]}
+\newcommand{\EE}[1]{\mathbb{E}\left[#1\right]}
+
+\newcommand{\Neta}{{N_\eta}}
+\newcommand{\Nxi}{{N_\xi}}
+
+\newcommand{\etaj}{\eta^{(j)}}
+
+\newcommand{\EExi}[1]{\mathbb{E}_\xi\left[#1\right]}
+\newcommand{\EEeta}[1]{\mathbb{E}_\eta\left[#1\right]}
+\newcommand{\Vxi}[1]{\mathbb{V}ar_\xi\left[#1\right]}
+\newcommand{\Veta}[1]{\mathbb{V}ar_\eta\left[#1\right]}
+
+\newcommand{\Qpoll}{\tilde{Q}_\Neta}
+\newcommand{\SigSqeta}{\sigma^2_\eta}
+
+% \newcommand{\defin}{\stackrel{\bigtriangleup}{=}}
+\newcommand{\defin}{\triangleq}
+
+\newcommand{\xiu}{{\xi_u}}
+\newcommand{\xinu}{{\xi_{\sim u}}}
+\newcommand{\Nsi}{{N_{SI}}}
+\newcommand{\EEu}[1]{\mathbb{E}_{\xiu} \left[#1\right]}
+\newcommand{\EEnu}[1]{\mathbb{E}_{\xinu} \left[#1\right]}
+\newcommand{\Vu}[1]{\mathbb{V}ar_{\xiu}\left[#1\right]}
+\newcommand{\Vnu}[1]{\mathbb{V}ar_{\xinu} \left[#1\right]}
+\newcommand{\Ppoll}{\tilde{P}_\Nsi}

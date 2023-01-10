@@ -1,0 +1,49 @@
+\chapter{Objectives} \label{ch-objectives}
+\textcolor{blue}{Last update - 01/09/23}
+There are three main research objectives which will correlate with three journal article submissions. 
+
+\section{Variance deconvolution for uncertainty quantification}
+Develop robust theory for an accurate, efficient, and broadly applicable variance deconvolution estimator for uncertainty quantification with stochastic solvers. Demonstrate the estimator's practical use over a number of relevant radiation transport test cases.
+\begin{todolist}
+    \item[\done] Develop a theoretical framework for forward uncertainty propagation which accounts for the additional variability introduced by the stochastic solver. Build on previous work by Aaron Olson \textcolor{red}{[cite]}, which uses a version of this variance deconvolution estimator that slightly inaccurately estimated the total and solver variance. 
+    \item[\done] Verify accuracy of estimator by with a test problem. The validation problem will consider transmittance through a 1D slab with different material sections. In the case of attenuation-only physics, the problem has an analytic solution to compare how MCUQ with an analytic solver compares to numerical results from MCUQ with MCRT. 
+    \item[\done] Develop an optimization method such that given a fixed total computational cost, a user could determine an ideal ratio of MCUQ samples to MCRT histories. This optimum configuration would be such that the estimate of UQ statistics like mean and variance have the highest possible accuracy given the cost constraint.
+    \item A subset of the above work has been presented at ANS 2022 Annual Meeting, the transactions publication of which is in the Appendix. Full paper submission is intended for the Journal of Quantitative Spectroscopy and Radiative Transfer. A draft version of the full paper is also available in the Appendix.
+\end{todolist}
+
+
+% =================================================================
+\section{Global sensitivity analysis for stochastic solvers}
+ Understand how use of stochastic solver affects both sampling-based and PCE surrogate-based GSA. Develop methodologies to use stochastic solvers in GSA by explicity accounting for the variability they introduce.
+\begin{todolist}
+    \item Compare standard MC-Saltelli approach with a stochastic solver to MC-Saltelli approach with a deterministic solver to understand what variability is introduced.
+    \item Compare surrogate-based GSA with a stochastic solver to surrogate-based GSA with a deterministic solver to understand what variability is introduced.
+    \item Explore what other approaches exist to account for stochastic solvers in GSA. 
+    \item Apply the developed variance deconvolution method to the standard MC-Saltelli approach, standard PCE approach, and other popular existing approaches. How does the computational cost compare? How does the accuracy compare? In what situations is it worth applying variance deconvolution? 
+    \item Extended abstract submitted for consideration for ANS M\&C 2023, included in Appendix. If accepted, develop into full summary, then into full paper for submission to special issue of \textit{Nuclear Science and Engineering}. (From the M\&C2023 website, \url{https://mc2023.com/}: Authors of M\&C 2023 are invited to submit their work for consideration in a special issue of the Nuclear Science and Engineering (NSE) journal. Details of the submission process will be posted closer to the Conference date.)
+\end{todolist}
+
+
+% =================================================================
+\section{Challenge problem}
+% Ideas, which may be integrated together into a paper or could be smaller shoot-offs:
+% Chris Moore from Sandia recommended applying the var-deconv methodology to a broader scope of stochastic solver problems, not just MC radiation transport, like plasmas or fluid dynamics. 
+% Depending on the scope of the second paper, perhaps that one ends up just sampling-based GSA, and the third paper is PCE/surrogate-based GSA.
+% Not necessarily proposing a hybrid, because that assumes that we fully understand both the sampling approach and the PCE approach well enough to combine and do both.
+% Large PSAAP problem full example: Something like Dakota, but for stochastic solvers. Automated algorithm such that given problem definition, do pilot study w/ given computational budget, run GSA/UQ. Further: use pilot study to determine how many histories are needed for a certain confidence for all SIs and run that, or use pilot study to determine what the top SIs are and further refine those.
+% More complex cost models. Paper 1 assumes linear cost model, ie that one UQ re-sample and one RT re-sample cost the same; incorporate possibility that this is not the case. Allow for adaptive cost model. 
+% Surrogates like PCE perform poorly if you have some model irregularity like a sharp corner. Compare if the PCE and sampling converge to the same results, to know where you can and can't trust the surrogate. A hybrid approach would be using the sampling points to build the PCE, but then you'd need to know how to correct the PCE coefficient bias. This depends on a good understanding of both PCE and sampling-based independently in order to then integrate them, so this is a far goal.
+Demonstrate larger applicability of the methods developed for UQ and GSA with stochastic solvers by applying the methods to radiation transport problems with more complex and realistic physics, particularly physics relevant to CEMeNT's PSAAP challenge problem, using CEMeNT's MCDC codebase. Understand how method cost changes with finer tally meshing.
+\begin{todolist}
+    \item Integrate MCUQ variance deconvolution framework into existing MCDC codebase. Test against results from paper 1. 
+    \item Develop more complex cost model such that estimator is tunable for different configurations. Current estimator assumes linear cost model, \textit{i.e.} that one UQ re-sample and one RT re-sample cost the same; incorporate possibility that this is not the case.
+    \item Create library that functions as wrapper around MCDC such that a user can create an MCDC input, specify uncertainty parameters, and run a GSA study similar to what Dakota (Sandia UQ software) might run.
+    \item Test library with complex radiation transport physics, complex quantities of interest, and realistically large numbers of tallies.
+    \item Publication of this work.
+\end{todolist}
+
+
+\section{Possible difficulties and contingencies}
+As work for the second paper is ongoing, unforeseen complications that need to be explored could arise with both the sampling-based GSA and PCE/surrogate-based GSA. If the scope of the work becomes large enough such that there is too much to include both forms of GSA in the paper, I intend to shift focus away from PCE and stick to sampling-based GSA analysis.
+
+I don't anticipate that the cost of this MCUQ estimator will scale with number of tallies differently than the cost of MCRT does, but if so, additional methods may need to be developed to reduce cost.

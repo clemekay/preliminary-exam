@@ -27,6 +27,12 @@
 \usepackage[bf]{caption} % caption: FIG in bold
 \usepackage{fancyhdr} % For the headers
 
+\usepackage{titlesec}
+\titleformat{\chapter}[hang]
+{\normalfont\huge\bfseries}{\thechapter}{20pt}{\Huge}
+\titleformat{\section}
+{\normalfont\Large\bfseries}{\thesection}{1em}{}
+
 \newcommand{\numberedchapter}{ % Preparation for numbered chapters
 	\cleardoublepage % To make sure the previous headers are passed
 	\fancyhead[RE]{{\bfseries \leftmark}}% Headers for left pages
@@ -40,15 +46,14 @@
 \usepackage{emptypage} % No headers on an empty page
 
 \usepackage{eso-pic} % For the background picture on the title page
-\newcommand\BackgroundPic{
-    \put(-250,-160){
-    \parbox[b][\paperheight]{\paperwidth}{
-        \vfill
-        \centering
-        \includegraphics[width=\paperwidth]{symbol.jpg}
-        \vfill}
-    }
-}
+\newcommand\BackgroundPic{%
+\put(-250,-160){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+\includegraphics[width=\paperwidth]{symbol.jpg}%
+\vfill
+}}}
 
 \usepackage{hyperref} % Adds clickable links at references
 
@@ -74,7 +79,7 @@
 %\AddToShipoutPicture*{\BackgroundPic}
 \begin{center}
 \vfill
-{\large \scshape Department of Physics, School of Sciences\\Walailak University}\\[1.4cm]
+{\large \scshape School of Nuclear Science and Engineering\\Oregon State University}\\[1.4cm]
 {\Large PhD Thesis Proposal}\\[1.4cm]
 %\rule{\textwidth}{1.5pt}\\[0cm]
 {\huge \bfseries \thesistitle \par \ }\\[-0.5cm]
@@ -99,6 +104,8 @@
 \fancyhf{}% Clears header and footer
 \fancyhead[RO,LE]{\thepage} % page number on the outside of headers
 
+% \input{Preamble/abstract}
+
 %----------------------------------------------------------------------------------------
 %	LIST OF CONTENTS/FIGURES/TABLES
 %----------------------------------------------------------------------------------------
@@ -110,16 +117,15 @@
 %	THESIS MAIN TEXT - CHAPTERS
 %----------------------------------------------------------------------------------------
 
-\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+% \addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
 \mainmatter % Begin numeric (1,2,3...) page numbering
 
 \numberedchapter
-\input{MainText/chapter1} % Import your chapters here
-\input{MainText/chapter2}
-\input{MainText/chapter3}
-\input{MainText/chapter4}
-\input{MainText/chapter5}
-\input{MainText/chapter6}
+\input{MainText/1-introduction.tex} % Import your chapters here
+\input{MainText/2-objectives.tex}
+\input{MainText/3-method.tex}
+\input{MainText/4-results.tex}
+\input{MainText/5-schedule.tex}
  
 %----------------------------------------------------------------------------------------
 %	APPENDICES
