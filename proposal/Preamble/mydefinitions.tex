@@ -1,5 +1,5 @@
 %----------------------------------------------------------------------------------------
-%	VALUES FOR THE THESIS
+%	COMMANDS FOR THE THESIS
 %----------------------------------------------------------------------------------------
 
 \newcommand{\name}{Kayla Clements} % Author name
@@ -21,19 +21,20 @@
 
 
 %----------------------------------------------------------------------------------------
-%	YOUR PACKAGES (be careful of package interaction)
+%	PACKAGES (be careful of package interaction)
 %----------------------------------------------------------------------------------------
 
-\usepackage{amsthm,amsmath,amssymb,amsfonts,bbm}% Math symbols
+\usepackage{amsmath, amsthm, amssymb, amsfonts, amstext, bm, bbm, mathtools} % Math symbols
+\usepackage{graphicx, subfigure, caption, epsfig, psfrag} % Figures
+\usepackage{threeparttable, colortbl, multirow} % Tables
+\usepackage{soul, pifont, color, hyperref, bbding, textcomp, manfnt, latexsym, wasysym} % Fonts
+\usepackage{enumitem}
+\usepackage[ruled, vlined]{algorithm2e}
+% \usepackage[makeroom]{cancel}
 
 %----------------------------------------------------------------------------------------
-%	YOUR DEFINITIONS AND COMMANDS
+%	DEFINITIONS AND COMMANDS
 %----------------------------------------------------------------------------------------
-
-% New Commands
-\newcommand{\bea}{\begin{eqnarray}} % Shortcut for equation arrays
-\newcommand{\eea}{\end{eqnarray}}
-\newcommand{\e}[1]{\times 10^{#1}}  % Powers of 10 notation
 
 % Defining a theorem box for Criteria
 \newtheorem{critere}{Criterion}
@@ -46,73 +47,68 @@
 \end{minipage}  } \end{center}
 }
 
-% Kayla
 \newcommand{\todo}[1]{\textcolor{red}{(#1)}}
 % todo command from https://tex.stackexchange.com/questions/247681/how-to-create-checkbox-todo-list
-\usepackage{enumitem}
+% \usepackage{enumitem}
 \newlist{todolist}{itemize}{2}
 \setlist[todolist]{label=$\square$}
-\usepackage{pifont}
+% \usepackage{pifont}
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
 \newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}%
 {\large\hspace{1pt}\cmark}}\hspace{-2.5pt}}
 \newcommand{\cancel}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}
 
-% Definitions ---------------------------------------------------------------------
-% Add your own definitions here --------------------------------------------------
-\newcommand{\kbcvar}[2][]{\mathbb{V}ar_{#1} \left[ #2 \right] }
-\newcommand{\kbcexpec}[2][]{\mathbb{E}_{#1} \left[ #2 \right] }
+% General
+\newcommand{\bea}{\begin{eqnarray}} % Shortcut for equation arrays
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\e}[1]{\times 10^{#1}}  % Powers of 10 notation
+\newcommand{\defin}{\triangleq}
+\newcommand{\pdiff}[2]{ \frac{ \partial #1 }{ \partial #2 } }
+\newcommand{\red}[1]{{\color{red}\textbf{#1}}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\newcommand{\green}[1]{{\color{ForestGreen}\textbf{#1}}}
+\newcommand{\tal}[1]{\textbf{\alert{#1}}}
 
-%commands from primer
-\newcommand{\kbcVar}[1]{\mathbb{V}ar\left[#1\right]}
-\newcommand{\kbcEE}[1]{\mathbb{E}\left[#1\right]}
-\newcommand{\kbcCov}[2]{\mathbb{C}ov\left[#1,#2\right]}
-
-\newcommand{\kbcEExi}[1]{\mathbb{E}_\xi\left[#1\right]}
-\newcommand{\kbcEEeta}[1]{\mathbb{E}_\eta\left[#1\right]}
-
-\newcommand{\kbcNxi}{N_\xi}
-\newcommand{\kbcNeta}{N_\eta}
-
-\newcommand{\kbcVeta}[1]{\mathbb{V}ar_{\eta}\left[#1\right]}
-\newcommand{\kbcVxi}[1]{\mathbb{V}ar_{\xi}\left[#1\right]}
-
-\newcommand{\kbcdefin}{\overset{\operatorname{def}}{=}}
-
+% Attenuation equation
 \newcommand{\StmD}{\Sigma_t^\Delta \Delta x}
 \newcommand{\StdD}{\Sigma_t^\Delta \Delta x}
+\newcommand{\Stm}{\Sigma_{t,m}^{0}}
+\newcommand{\Std}{\Sigma_{t,m}^{\Delta}}
 
-\newcommand{\kbcxii}{\xi^{(i)}}
-\newcommand{\kbcetaj}{\eta^{(j)}}
-
-\newcommand{\kbcQexp}{\hat{Q}}
-\newcommand{\kbcQpoll}{\tilde{Q}}
-
-\newcommand{\kbcSigSqeta}{\sigma^2_\eta}
-\newcommand{\kbcSigSqRT}{\sigma^2_{RT,\kbcNeta}}
-\newcommand{\kbcmuRT}{\hat{\mu}_{\kbcSigSqRT}}
-\newcommand{\kbchatSgSqeta}{\hat{\sigma}^2_\eta}
-
+% Var and EE
 \newcommand{\Var}[1]{\mathbb{V}ar\left[#1\right]}
 \newcommand{\EE}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\Cov}[2]{\mathbb{C}ov\left[#1,#2\right]}
 
-\newcommand{\Neta}{{N_\eta}}
-\newcommand{\Nxi}{{N_\xi}}
-
-\newcommand{\etaj}{\eta^{(j)}}
-
+% Xi
 \newcommand{\EExi}[1]{\mathbb{E}_\xi\left[#1\right]}
-\newcommand{\EEeta}[1]{\mathbb{E}_\eta\left[#1\right]}
 \newcommand{\Vxi}[1]{\mathbb{V}ar_\xi\left[#1\right]}
+\newcommand{\Nxi}{{N_\xi}}
+\newcommand{\xii}{\xi^{(i)}}
+\newcommand{\sumxi}{\sum_{i=1}^{\Nxi}}
+
+% Eta
+\newcommand{\EEeta}[1]{\mathbb{E}_\eta\left[#1\right]}
 \newcommand{\Veta}[1]{\mathbb{V}ar_\eta\left[#1\right]}
+\newcommand{\Neta}{{N_\eta}}
+\newcommand{\etaj}{\eta^{(j)}}
+\newcommand{\etak}{\eta^{(k)}}
+\newcommand{\Zeta}{ {Z_\eta} }
+\newcommand{\muRT}{\hat{\mu}_{\SigSqRT}}
+\newcommand{\sumeta}{\sum_{j=1}^\Neta}
 
-\newcommand{\Qpoll}{\tilde{Q}_\Neta}
+% Estimators
+\newcommand{\Qpoll}{\tilde{Q}}
+\newcommand{\Qhat}{\hat{Q}}
 \newcommand{\SigSqeta}{\sigma^2_\eta}
+\newcommand{\SigSqRT}{\sigma^2_{RT,\Neta}}
+\newcommand{\hatSigSqeta}{\hat{\sigma}^2_\eta}
+\newcommand{\fij}{f(\xii,\etaj)}
+\newcommand{\f}{f(\xi,\eta)}
+\newcommand{\ft}{\tilde{f}}
 
-% \newcommand{\defin}{\stackrel{\bigtriangleup}{=}}
-\newcommand{\defin}{\triangleq}
-
+% PCE
 \newcommand{\xiu}{{\xi_u}}
 \newcommand{\xinu}{{\xi_{\sim u}}}
 \newcommand{\Nsi}{{N_{SI}}}
@@ -121,3 +117,9 @@
 \newcommand{\Vu}[1]{\mathbb{V}ar_{\xiu}\left[#1\right]}
 \newcommand{\Vnu}[1]{\mathbb{V}ar_{\xinu} \left[#1\right]}
 \newcommand{\Ppoll}{\tilde{P}_\Nsi}
+\newcommand{\hf}{\mathrm{HF}}
+\newcommand{\LF}{\mathrm{LF}}
+\newcommand{\kn}{{\Large\dbend\normalsize\hspace{1mm}}}
+\newcommand{\PCE}{Q^{PC}}
+\newcommand{\PCvar}{\hat{\sigma}^{2}_{PC}}
+
